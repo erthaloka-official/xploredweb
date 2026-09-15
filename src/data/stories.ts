@@ -1,0 +1,55 @@
+import { Story } from '../types/cms';
+
+export const stories: Story[] = [
+  {
+    id: 'sty-01',
+    slug: 'from-circuit-diagrams-to-field-telemetry',
+    title: 'From Circuit Diagrams to Deploying Autonomous Rovers in Stuttgart',
+    category: 'Learner Story',
+    date: 'February 2026',
+    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop',
+    summary: 'How a cohort of 16 high school students tested their own obstacle-avoidance code in an active industrial EV testing facility.',
+    body: 'For months, students had learned PID feedback loops and kinematics on whiteboard equations. During the 5-day lab immersion in Stuttgart, their algorithms were uploaded directly into physical 1:5 scale rovers facing real-time friction variations.',
+    author: {
+      name: 'Aditi Sharma',
+      role: 'Grade 11 Student',
+      institution: 'The Valley School, Bengaluru',
+    },
+    relatedProgramId: 'prog-01',
+    keyTakeaway: 'Physical feedback in real-world environments turns abstract physics into intuitive engineering instinct.',
+  },
+  {
+    id: 'sty-02',
+    slug: 'reconnecting-curriculum-with-living-ecosystems',
+    title: 'Reconnecting CBSE Biology with Living Forest Soil',
+    category: 'Institutional Impact',
+    date: 'January 2026',
+    image: 'https://images.unsplash.com/photo-1592417817098-8f3d691060bb?q=80&w=1200&auto=format&fit=crop',
+    summary: 'A school leadership team integrated xplorED regenerative ecology field modules to transform their Grade 10 science curriculum.',
+    body: 'By bridging standard textbook units on nitrogen cycles and soil conservation with 40-acre field microscopy and LoRaWAN IoT telemetry, student engagement and retention jumped dramatically.',
+    author: {
+      name: 'Dr. Ramesh Sundaram',
+      role: 'Dean of Academic Innovation',
+      institution: 'Heritage International Schools',
+    },
+    relatedProgramId: 'prog-02',
+    keyTakeaway: 'Real-world places provide the richest laboratories for institutional curriculum goals.',
+  },
+  {
+    id: 'sty-03',
+    slug: 'craft-whispers-to-modern-cybernetics',
+    title: 'What a 500-Year-Old Temple Joinery Master Taught Robotics Fellows',
+    category: 'Practitioner Reflection',
+    date: 'November 2025',
+    image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=1200&auto=format&fit=crop',
+    summary: 'Kyoto master artisan Hiroshi Morimoto reflects on hosting international students inside his Kumiko atelier.',
+    body: 'The young students arrived expecting rapid 3D printing, but spent their first two days feeling the grain and moisture of ancient cedar. By understanding friction and natural tolerance, their subsequent robotic gripper designs achieved unprecedented delicacy.',
+    author: {
+      name: 'Hiroshi Morimoto',
+      role: 'Master Craftsman',
+      institution: 'Morimoto Atelier, Kyoto',
+    },
+    relatedProgramId: 'prog-03',
+    keyTakeaway: 'Master practitioners pass down timeless insights on patience, material honesty, and human-centered design.',
+  },
+];
