@@ -34,12 +34,53 @@ export const PilotBuilderModal: React.FC<PilotBuilderModalProps> = ({
     { id: 'Coral Acoustics & Marine AI', desc: 'Hydrophone recordings and bio-acoustic machine learning' },
   ];
 
-  const handleComplete = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleComplete = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
     const summary = `Pilot Request: ${institutionType} | Theme: ${theme} | Format: ${format} | Size: ${cohortSize} | Institution: ${schoolName} (${name} <${email}>)`;
-    onPilotCreated(summary);
-    onClose();
-    setStep(1);
+
+    try {
+      const formPayload = new FormData();
+      formPayload.append('access_key', 'd09cd22b-b6d4-4df7-bb0a-690ae8881808');
+      formPayload.append('subject', `xplorED Pilot Proposal Request: ${schoolName}`);
+      formPayload.append('from_name', 'xplorED Pilot Builder');
+      formPayload.append('name', name);
+      formPayload.append('email', email);
+      formPayload.append('institutionName', schoolName);
+      formPayload.append('institutionType', institutionType);
+      formPayload.append('theme', theme);
+      formPayload.append('format', format);
+      formPayload.append('cohortSize', cohortSize);
+      formPayload.append('timeline', term);
+      formPayload.append('summary', summary);
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formPayload,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success !== false) {
+        onPilotCreated(summary);
+        onClose();
+        setStep(1);
+        setName('');
+        setEmail('');
+        setSchoolName('');
+      } else {
+        setError(data.message || 'Unable to submit pilot proposal right now.');
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -204,19 +245,57 @@ export const PilotBuilderModal: React.FC<PilotBuilderModalProps> = ({
         {step === 3 && (
           <form onSubmit={handleComplete}>
             <h4 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '0.5rem' }}>
-              Step 3: Timeline & Proposal Delivery
+              Step 3: Timeline & Contact Details
             </h4>
             <p className="text-small" style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
-              We will generate a customized pilot blueprint with curriculum links, mentor profiles, and safety specs.
+              We will assemble a tailored itinerary, cost structure, and faculty alignment proposal.
             </p>
 
+            {error && (
+              <div
+                style={{
+                  padding: '0.85rem 1.25rem',
+                  backgroundColor: '#FEE2E2',
+                  color: '#991B1B',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.875rem',
+                  marginBottom: '1.25rem',
+                  fontWeight: 500,
+                }}
+              >
+                {error}
+              </div>
+            )}
+
             <div className="form-group">
-              <label className="form-label">Preferred Launch Timeline</label>
-              <select className="form-select" value={term} onChange={(e) => setTerm(e.target.value)}>
-                <option value="Upcoming Term (Next 1–3 Months)">Upcoming Term (Next 1–3 Months)</option>
-                <option value="Mid-Year Term Break (Summer/Winter)">Mid-Year Term Break (Summer/Winter)</option>
-                <option value="Next Academic Year Planning">Next Academic Year Planning</option>
-              </select>
+              <label className="form-label">Target Launch Window</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                {[
+                  'Upcoming Term (2–4 Months)',
+                  'Next Academic Semester (4–6 Months)',
+                  'Summer Immersion Sprint',
+                  'Custom Academic Window',
+                ].map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setTerm(item)}
+                    style={{
+                      padding: '0.85rem',
+                      textAlign: 'left',
+                      borderRadius: 'var(--radius-md)',
+                      border: term === item ? '2px solid var(--navy)' : '1px solid var(--border-light)',
+                      backgroundColor: term === item ? 'var(--blue-light)' : '#FFFFFF',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: term === item ? 'var(--navy)' : 'var(--text-primary)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="form-grid-2">
@@ -261,8 +340,8 @@ export const PilotBuilderModal: React.FC<PilotBuilderModalProps> = ({
               <SecondaryButton icon={<ArrowLeft size={16} />} onClick={() => setStep(2)}>
                 Back
               </SecondaryButton>
-              <PrimaryButton type="submit" icon={<Sparkles size={16} />}>
-                Generate Pilot Proposal Blueprint
+              <PrimaryButton type="submit" disabled={loading} icon={loading ? undefined : <Sparkles size={16} />}>
+                {loading ? 'Submitting Proposal...' : 'Generate Pilot Proposal Blueprint'}
               </PrimaryButton>
             </div>
           </form>

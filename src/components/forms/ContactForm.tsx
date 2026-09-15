@@ -34,7 +34,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -45,14 +45,43 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
     setLoading(true);
 
-    // Simulate API network call
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-      if (onSuccessSubmit) {
-        onSuccessSubmit(formData);
+    try {
+      const formPayload = new FormData();
+      formPayload.append('access_key', 'd09cd22b-b6d4-4df7-bb0a-690ae8881808');
+      formPayload.append('subject', `xplorED Partnership Enquiry: ${formData.category} - ${formData.organisation}`);
+      formPayload.append('from_name', 'xplorED Platform');
+      formPayload.append('name', formData.name);
+      formPayload.append('organisation', formData.organisation);
+      formPayload.append('email', formData.email);
+      formPayload.append('role', formData.role || 'Not specified');
+      formPayload.append('category', formData.category);
+      formPayload.append('learnerStage', formData.learnerStage || 'Not specified');
+      formPayload.append('phone', formData.phone || 'Not specified');
+      formPayload.append('message', formData.message || 'No additional message provided.');
+      if (formData.programOfInterest) {
+        formPayload.append('programOfInterest', formData.programOfInterest);
       }
-    }, 600);
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formPayload,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success !== false) {
+        setSubmitted(true);
+        if (onSuccessSubmit) {
+          onSuccessSubmit(formData);
+        }
+      } else {
+        setError(data.message || 'Unable to submit enquiry right now. Please try again or email us directly.');
+      }
+    } catch (err: any) {
+      setError('Network error: Unable to connect. Please check your connection or email connect@xplored.in directly.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
