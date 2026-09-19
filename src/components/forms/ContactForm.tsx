@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { EnquirySubmission } from '../../types/cms';
 import { PrimaryButton } from '../common/PrimaryButton';
 
@@ -30,139 +30,64 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     programOfInterest: initialProgramTitle,
   });
 
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
 
-    if (!formData.name.trim() || !formData.email.trim() || !formData.organisation.trim()) {
-      setError('Please fill in all required fields (Name, Email, Organisation).');
-      return;
+    const form = e.currentTarget;
+    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+
+    const formDataPayload = new FormData(form);
+    formDataPayload.append('access_key', '8fb272e4-37c4-4adc-8611-da05c7dd2b2d');
+
+    const originalText = submitBtn ? submitBtn.textContent || 'Submit Partnership Enquiry' : 'Submit Partnership Enquiry';
+
+    if (submitBtn) {
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
     }
 
-    setLoading(true);
-
     try {
-      const formPayload = new FormData();
-      formPayload.append('access_key', '8fb272e4-37c4-4adc-8611-da05c7dd2b2d');
-      formPayload.append('subject', `xplorED Partnership Enquiry: ${formData.category} - ${formData.organisation}`);
-      formPayload.append('from_name', 'xplorED Platform');
-      formPayload.append('name', formData.name);
-      formPayload.append('organisation', formData.organisation);
-      formPayload.append('email', formData.email);
-      formPayload.append('role', formData.role || 'Not specified');
-      formPayload.append('category', formData.category);
-      formPayload.append('learnerStage', formData.learnerStage || 'Not specified');
-      formPayload.append('phone', formData.phone || 'Not specified');
-      formPayload.append('message', formData.message || 'No additional message provided.');
-      if (formData.programOfInterest) {
-        formPayload.append('programOfInterest', formData.programOfInterest);
-      }
-
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        body: formPayload,
+        body: formDataPayload,
       });
 
       const data = await response.json();
 
-      if (response.ok && data.success !== false) {
-        setSubmitted(true);
+      if (response.ok) {
+        alert('Success! Your message has been sent.');
+        form.reset();
+        setFormData({
+          name: '',
+          organisation: '',
+          role: '',
+          email: '',
+          phone: '',
+          category: (initialCategory as any) || 'Institution',
+          track: 'Pilot',
+          learnerStage: 'Grades 9–12',
+          location: '',
+          message: '',
+        });
         if (onSuccessSubmit) {
           onSuccessSubmit(formData);
         }
       } else {
-        setError(data.message || 'Unable to submit enquiry right now. Please try again or email us directly.');
+        alert('Error: ' + data.message);
       }
-    } catch (err: any) {
-      setError('Network error: Unable to connect. Please check your connection or email connect@xplored.in directly.');
+    } catch (error) {
+      alert('Something went wrong. Please try again.');
     } finally {
-      setLoading(false);
+      if (submitBtn) {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
     }
   };
 
-  if (submitted) {
-    return (
-      <div
-        className="card-soft"
-        style={{
-          padding: '3rem 2rem',
-          textAlign: 'center',
-          backgroundColor: '#FFFFFF',
-          border: '1px solid var(--border-light)',
-          borderRadius: 'var(--radius-xl)',
-          boxShadow: 'var(--shadow-md)',
-        }}
-      >
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: '50%',
-            backgroundColor: 'var(--accent-emerald-bg)',
-            color: 'var(--accent-emerald)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 1.5rem auto',
-          }}
-        >
-          <CheckCircle2 size={36} />
-        </div>
-
-        <h3 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--navy)', marginBottom: '0.75rem' }}>
-          Thank You, {formData.name}.
-        </h3>
-
-        <p className="text-lead" style={{ maxWidth: '540px', margin: '0 auto 1.75rem auto', fontSize: '1.1rem' }}>
-          We’ve received your enquiry for <strong>{formData.organisation}</strong>. Our partnerships team will connect with you within 24 hours to explore the right experience or partnership blueprint.
-        </p>
-
-        <div
-          style={{
-            padding: '1.25rem',
-            backgroundColor: 'var(--bg-soft)',
-            borderRadius: 'var(--radius-md)',
-            maxWidth: '480px',
-            margin: '0 auto 2rem auto',
-            textAlign: 'left',
-            fontSize: '0.875rem',
-          }}
-        >
-          <div style={{ color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Enquiry Summary:</div>
-          <div style={{ color: 'var(--navy)', fontWeight: 600 }}>Track: {formData.category} ({formData.track || 'General'})</div>
-          <div style={{ color: 'var(--text-secondary)' }}>Confirmation sent to: {formData.email}</div>
-        </div>
-
-        <button
-          onClick={() => {
-            setSubmitted(false);
-            setFormData({
-              name: '',
-              organisation: '',
-              role: '',
-              email: '',
-              phone: '',
-              category: 'Institution',
-              track: 'Pilot',
-              learnerStage: 'Grades 9–12',
-              location: '',
-              message: '',
-            });
-          }}
-          className="btn btn-secondary btn-sm"
-        >
-          Submit Another Enquiry
-        </button>
-      </div>
-    );
-  }
-
   return (
     <form
+      id="form"
       onSubmit={handleSubmit}
       style={{
         backgroundColor: '#FFFFFF',
@@ -172,21 +97,10 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         boxShadow: 'var(--shadow-card)',
       }}
     >
-      {error && (
-        <div
-          style={{
-            padding: '0.85rem 1.25rem',
-            backgroundColor: '#FEE2E2',
-            color: '#991B1B',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '0.875rem',
-            marginBottom: '1.5rem',
-            fontWeight: 500,
-          }}
-        >
-          {error}
-        </div>
-      )}
+      <input type="hidden" name="access_key" value="8fb272e4-37c4-4adc-8611-da05c7dd2b2d" />
+      <input type="hidden" name="subject" value={`xplorED Partnership Enquiry: ${formData.category} - ${formData.organisation || 'New'}`} />
+      <input type="hidden" name="from_name" value="xplorED Platform" />
+      <input type="hidden" name="category" value={formData.category} />
 
       {/* Category Selection Tabs */}
       <div style={{ marginBottom: '2rem' }}>
@@ -233,6 +147,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           </label>
           <input
             type="text"
+            name="name"
             required
             className="form-input"
             placeholder="e.g. Dr. Priya Nair"
@@ -247,6 +162,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           </label>
           <input
             type="text"
+            name="organisation"
             required
             className="form-input"
             placeholder="e.g. Greenwood High / AeroTech Labs"
@@ -264,6 +180,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           </label>
           <input
             type="email"
+            name="email"
             required
             className="form-input"
             placeholder="e.g. priya@institution.org"
@@ -276,6 +193,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           <label className="form-label">Role / Designation</label>
           <input
             type="text"
+            name="role"
             className="form-input"
             placeholder="e.g. Principal / Dean / Research Lead"
             value={formData.role}
@@ -290,6 +208,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           <label className="form-label">Target Learner Stage</label>
           <select
             className="form-select"
+            name="learnerStage"
             value={formData.learnerStage}
             onChange={(e) => setFormData({ ...formData, learnerStage: e.target.value })}
           >
@@ -306,6 +225,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           <label className="form-label">Phone / WhatsApp (Optional)</label>
           <input
             type="tel"
+            name="phone"
             className="form-input"
             placeholder="+91 98765 43210"
             value={formData.phone}
@@ -321,6 +241,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         </label>
         <textarea
           className="form-textarea"
+          name="message"
           rows={4}
           placeholder="Tell us about your learning objectives, desired real-world theme, cohort size, or partnership ideas..."
           value={formData.message}
@@ -333,10 +254,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         type="submit"
         size="lg"
         fullWidth
-        disabled={loading}
-        icon={loading ? undefined : <ArrowRight size={18} />}
+        icon={<ArrowRight size={18} />}
       >
-        {loading ? 'Submitting Enquiry...' : 'Submit Partnership Enquiry'}
+        Submit Partnership Enquiry
       </PrimaryButton>
 
       <p className="text-small" style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-muted)' }}>
