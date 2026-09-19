@@ -19,7 +19,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEnquiry }) => 
           {/* Col 1: Brand Philosophy */}
           <div>
             <div className="footer-brand-title" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <Compass size={28} color="#60A5FA" strokeWidth={2.5} />
+              <img
+                src="/logo.png"
+                alt="xplorED Logo"
+                style={{
+                  width: '34px',
+                  height: '34px',
+                  objectFit: 'contain',
+                  borderRadius: '6px',
+                  backgroundColor: '#FFFFFF',
+                  padding: '3px',
+                }}
+              />
               <span>xplor<span style={{ color: '#60A5FA' }}>ED</span></span>
             </div>
             <p className="footer-brand-tagline">

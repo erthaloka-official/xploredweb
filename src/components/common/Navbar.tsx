@@ -44,7 +44,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="brand-logo"
             aria-label="xplorED Home"
           >
-            <Compass size={24} color="var(--navy)" strokeWidth={2.5} />
+            <img
+              src="/logo.png"
+              alt="xplorED Logo"
+              style={{
+                width: '32px',
+                height: '32px',
+                objectFit: 'contain',
+              }}
+            />
             <span>
               xplor<span className="dot">ED</span>
             </span>
@@ -102,7 +110,15 @@ export const Navbar: React.FC<NavbarProps> = ({
       <aside className={`mobile-drawer ${mobileOpen ? 'open' : ''}`}>
         <div className="mobile-drawer-header">
           <div className="brand-logo">
-            <Compass size={22} color="var(--navy)" strokeWidth={2.5} />
+            <img
+              src="/logo.png"
+              alt="xplorED Logo"
+              style={{
+                width: '28px',
+                height: '28px',
+                objectFit: 'contain',
+              }}
+            />
             <span>
               xplor<span className="dot">ED</span>
             </span>
