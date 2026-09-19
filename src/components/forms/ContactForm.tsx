@@ -37,7 +37,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
 
     const formDataPayload = new FormData(form);
-    formDataPayload.append('access_key', '8fb272e4-37c4-4adc-8611-da05c7dd2b2d');
+    formDataPayload.set('access_key', '8fb272e4-37c4-4adc-8611-da05c7dd2b2d');
 
     const originalText = submitBtn ? submitBtn.textContent || 'Submit Partnership Enquiry' : 'Submit Partnership Enquiry';
 
@@ -97,7 +97,6 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         boxShadow: 'var(--shadow-card)',
       }}
     >
-      <input type="hidden" name="access_key" value="8fb272e4-37c4-4adc-8611-da05c7dd2b2d" />
       <input type="hidden" name="subject" value={`xplorED Partnership Enquiry: ${formData.category} - ${formData.organisation || 'New'}`} />
       <input type="hidden" name="from_name" value="xplorED Platform" />
       <input type="hidden" name="category" value={formData.category} />
