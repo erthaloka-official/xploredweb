@@ -20,15 +20,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEnquiry }) => 
           <div>
             <div className="footer-brand-title" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               <img
-                src="/logo.png"
+                src="/logo-white.png"
                 alt="xplorED Logo"
                 style={{
-                  width: '34px',
-                  height: '34px',
+                  width: '32px',
+                  height: '32px',
                   objectFit: 'contain',
-                  borderRadius: '6px',
-                  backgroundColor: '#FFFFFF',
-                  padding: '3px',
                 }}
               />
               <span>xplor<span style={{ color: '#60A5FA' }}>ED</span></span>
